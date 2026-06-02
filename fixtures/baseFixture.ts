@@ -1,6 +1,7 @@
 import { test as base, Page } from '@playwright/test';
 import { LoginPage } from '../pages/LoginPage';
 import { HomePage } from '../pages/HomePage';
+import { ReportsPage } from '../pages/ReportsPage';
 
 const APP_URL = 'https://apps.powerapps.com/play/e/88aafdc6-17fa-4c32-a5b5-35dbdbdf05c0/a/9d4e32af-d89c-4685-abc5-cdaa1913fd0c?tenantId=44f4e7a6-4821-44d7-b286-cd90436c6975&hint=a1f62549-ee5e-4ef6-a14c-97c22de63013&sourcetime=1779346434761&source=portal#';
 
@@ -8,6 +9,7 @@ type Fixtures = {
   loginPage: LoginPage;
   appPage: Page;
   homePage: HomePage;
+  reportsPage: ReportsPage;
 };
 
 export const test = base.extend<Fixtures>({
@@ -17,7 +19,7 @@ export const test = base.extend<Fixtures>({
 
   appPage: async ({ page }, use) => {
     await page.goto(APP_URL);
-    await page.waitForLoadState('networkidle', { timeout: 60000 });
+    await page.waitForLoadState('domcontentloaded', { timeout: 30000 });
     await use(page);
   },
 
@@ -26,6 +28,10 @@ export const test = base.extend<Fixtures>({
     const home = new HomePage(page);
     await home.waitForAppReady();
     await use(home);
+  },
+
+  reportsPage: async ({ page }, use) => {
+    await use(new ReportsPage(page));
   },
 });
 
