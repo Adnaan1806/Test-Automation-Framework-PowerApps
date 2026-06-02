@@ -1,0 +1,13 @@
+node_modules/
+dist/
+reports/
+
+# Auth state — contains real tokens, NEVER commit
+.auth/
+
+# Playwright artifacts
+test-results/
+playwright-report/
+
+# OS
+.DS_Store
