@@ -15,6 +15,23 @@ export class ReportsPage {
     return frame;
   }
 
+  async searchReport(query: string): Promise<void> {
+    const canvas = this.getCanvasFrame();
+    const searchBox = canvas.getByPlaceholder('Search for a report');
+    await searchBox.waitFor({ state: 'visible', timeout: 15000 });
+    await searchBox.fill(query);
+    // Wait for gallery to filter (debounce + render)
+    await this.page.waitForTimeout(2000);
+  }
+
+  async clickFirstReportResult(): Promise<void> {
+    const canvas = this.getCanvasFrame();
+    // Two galleries exist: first is a header row, second is the data row — click data row button
+    const viewButtons = canvas.getByRole('button', { name: /View item details/ });
+    await viewButtons.last().waitFor({ state: 'visible', timeout: 15000 });
+    await viewButtons.last().click();
+  }
+
   async waitForReportsPage(): Promise<void> {
     const canvas = this.getCanvasFrame();
     await canvas.getByText(/All Reports/).waitFor({ state: 'visible', timeout: 60000 });

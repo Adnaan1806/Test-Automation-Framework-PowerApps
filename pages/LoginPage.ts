@@ -20,7 +20,7 @@ export class LoginPage {
       .or(this.page.locator('input[type="email"]'))
       .or(this.page.locator('input[name="loginfmt"]'));
 
-    await emailInput.first().waitFor({ state: 'visible', timeout: 15000 });
+    await emailInput.first().waitFor({ state: 'visible', timeout: 30000 });
     await emailInput.first().fill(email);
     await this.page.getByRole('button', { name: 'Next' }).click();
   }
