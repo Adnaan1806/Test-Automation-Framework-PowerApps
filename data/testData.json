@@ -6,5 +6,36 @@
   "generalSection": {
     "reportingCurrency": "USD",
     "totalRevenueDeclared": "1000000"
+  },
+  "auditSection": {
+    "relatedServiceEngagements": "100000",
+    "audits": "200000",
+    "pieAudits": "50000",
+    "reviews": "150000",
+    "otherAssurance": "300000",
+    "esgAssurance": "75000",
+    "isEEA": "Yes",
+    "combinedTurnover": "100000",
+    "expectedTotal": 750000
+  },
+  "auditSectionMaxDigits": {
+    "relatedServiceEngagements": "99999999999999",
+    "audits": "99999999999999",
+    "pieAudits": "99999999999999",
+    "reviews": "99999999999999",
+    "otherAssurance": "99999999999999",
+    "esgAssurance": "99999999999999",
+    "isEEA": "No",
+    "expectedTotal": 399999999999996
+  },
+  "auditSectionInvalid": {
+    "relatedServiceEngagements": "0",
+    "audits": "77",
+    "pieAudits": "7287",
+    "reviews": "0",
+    "otherAssurance": "528",
+    "esgAssurance": "4525",
+    "isEEA": "Yes",
+    "combinedTurnover": "8938"
   }
 }

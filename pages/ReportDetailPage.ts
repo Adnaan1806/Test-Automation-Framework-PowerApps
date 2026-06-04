@@ -1,4 +1,4 @@
-import { Page, expect } from '@playwright/test';
+import { Page, Locator, expect } from '@playwright/test';
 import { BasePage } from './BasePage';
 import { TIMEOUTS } from '../constants/config';
 
@@ -82,5 +82,139 @@ export class ReportDetailPage extends BasePage {
   async assertGeneralSectionSaved(): Promise<void> {
     // Success notification renders on the main page, outside the canvas iframe
     await expect(this.page.getByText('Form saved: General')).toBeVisible({ timeout: TIMEOUTS.save });
+  }
+
+  // ---------------------------------------------------------------------------
+  // Section 2 — Audit and assurance revenue
+  // ---------------------------------------------------------------------------
+
+  async expandAuditSection(): Promise<void> {
+    const canvas = await this.getCanvasFrame();
+    await canvas.getByText('2. Audit and assurance revenue').click();
+    // Wait for the first input field to confirm the section opened
+    await canvas.getByRole('textbox', { name: /Related service engagements/i })
+      .waitFor({ state: 'visible', timeout: 15000 });
+  }
+
+  async fillAuditSection(data: {
+    relatedServiceEngagements: string;
+    audits: string;
+    pieAudits: string;
+    reviews: string;
+    otherAssurance: string;
+    esgAssurance: string;
+    isEEA: string;
+    combinedTurnover?: string;
+  }): Promise<void> {
+    const canvas = await this.getCanvasFrame();
+
+    // Some controls have aria-label "SAA" — use getByTitle() which reads the HTML
+    // title attribute (set by PowerApps) and always contains the descriptive name.
+    const fill = async (locator: Locator, value: string) => {
+      await locator.clear();
+      await locator.fill(value);
+    };
+
+    await fill(canvas.getByRole('textbox', { name: /Related service engagements/i }), data.relatedServiceEngagements);
+    await fill(canvas.getByTitle('2.2 Audits'), data.audits);
+    await fill(canvas.getByRole('textbox', { name: /2\.3 Of which audits at Public/i }), data.pieAudits);
+    await fill(canvas.getByRole('textbox', { name: /Reviews/i }), data.reviews);
+    await fill(canvas.getByRole('textbox', { name: /Other assurance engagements/i }), data.otherAssurance);
+    await fill(canvas.getByRole('textbox', { name: /2\.6 Of which ESG assurance/i }), data.esgAssurance);
+
+    // 2.8 EEA dropdown — button innerText() gives "Yes" or "No" directly.
+    // PowerApps only enables Save when a field value actually changes from its saved state.
+    // If the desired value is already selected we must toggle away first to mark the form dirty,
+    // then restore to the desired value.
+    const eeaBtn = canvas.getByRole('button', { name: /SAA|Yes|No/i });
+    const currentEEA = (await eeaBtn.innerText()).trim();
+    const oppositeEEA = data.isEEA === 'Yes' ? 'No' : 'Yes';
+
+    if (currentEEA === data.isEEA) {
+      // Already correct value — toggle away to make form dirty, then restore
+      await eeaBtn.click();
+      await canvas.getByRole('option', { name: oppositeEEA, exact: true }).click();
+    }
+    // Set to desired value (always runs — either as the first change, or as the restore)
+    await canvas.getByRole('button', { name: /SAA|Yes|No/i }).click();
+    await canvas.getByRole('option', { name: data.isEEA, exact: true }).click();
+
+    // 2.8.1 — only rendered when EEA = Yes
+    if (data.isEEA === 'Yes' && data.combinedTurnover) {
+      const combinedField = canvas.getByRole('textbox', { name: /2\.8\.1 Combined turnover/i });
+      await combinedField.waitFor({ state: 'visible', timeout: 10000 });
+      await fill(combinedField, data.combinedTurnover);
+    }
+  }
+
+  async getAuditTotal(): Promise<number> {
+    const canvas = await this.getCanvasFrame();
+    // 2.7 Total is readonly; title attribute holds the label even though aria-label is "SAA"
+    const raw = await canvas.getByTitle('2.7 Total').inputValue();
+    return parseFloat(raw.replace(/[^0-9.]/g, ''));
+  }
+
+  async saveAuditSection(): Promise<void> {
+    const canvas = await this.getCanvasFrame();
+    await canvas.getByRole('button', { name: /^Save$/ }).first().click();
+  }
+
+  async assertAuditSectionSaved(): Promise<void> {
+    // Toast on the main page (outside canvas)
+    await expect(
+      this.page.getByText('Form saved: Audit and assurance revenue')
+    ).toBeVisible({ timeout: TIMEOUTS.save });
+    // Section status badge inside the canvas updates to "Completed" after save
+    const canvas = await this.getCanvasFrame();
+    await expect(
+      canvas.getByText('Audit and assurance revenue Completed')
+    ).toBeVisible({ timeout: TIMEOUTS.save });
+  }
+
+  async assertCombinedTurnoverHidden(): Promise<void> {
+    const canvas = await this.getCanvasFrame();
+    await expect(
+      canvas.getByRole('textbox', { name: /Combined turnover from statutory audits/i })
+    ).not.toBeVisible();
+  }
+
+  // Boundary assertions
+
+  async assertAllAuditInputsRetainValue(expectedValue: string): Promise<void> {
+    const canvas = await this.getCanvasFrame();
+    const fields = [
+      canvas.getByRole('textbox', { name: /Related service engagements/i }),
+      canvas.getByTitle('2.2 Audits'),
+      canvas.getByRole('textbox', { name: /2\.3 Of which audits at Public/i }),
+      canvas.getByRole('textbox', { name: /Reviews/i }),
+      canvas.getByRole('textbox', { name: /Other assurance engagements/i }),
+      canvas.getByRole('textbox', { name: /2\.6 Of which ESG/i }),
+    ];
+    for (const field of fields) {
+      await expect(field).toHaveValue(expectedValue);
+    }
+  }
+
+  // Validation error assertions — messages render inside the canvas frame below each field
+
+  async assertPIEValidationError(): Promise<void> {
+    const canvas = await this.getCanvasFrame();
+    await expect(
+      canvas.getByText('Value can not be greater than Audits value')
+    ).toBeVisible();
+  }
+
+  async assertESGValidationError(): Promise<void> {
+    const canvas = await this.getCanvasFrame();
+    await expect(
+      canvas.getByText('Value can not be greater than Other assurance engagements')
+    ).toBeVisible();
+  }
+
+  async assertCombinedTurnoverValidationError(): Promise<void> {
+    const canvas = await this.getCanvasFrame();
+    await expect(
+      canvas.getByText('Value can not be greater than A&A revenue total')
+    ).toBeVisible();
   }
 }
