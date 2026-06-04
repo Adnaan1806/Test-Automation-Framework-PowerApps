@@ -2,5 +2,9 @@
   "reports": {
     "searchTerm": "fiji 2030",
     "expectedReportTitle": "Fiji 2030 Statistics Report"
+  },
+  "generalSection": {
+    "reportingCurrency": "USD",
+    "totalRevenueDeclared": "1000000"
   }
 }

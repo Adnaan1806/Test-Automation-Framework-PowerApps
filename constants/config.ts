@@ -9,4 +9,5 @@ export const TIMEOUTS = {
   navigation: 30_000,
   elementVisible: 10_000,
   galleryUpdate: 10_000,
+  save: 60_000,
 } as const;
