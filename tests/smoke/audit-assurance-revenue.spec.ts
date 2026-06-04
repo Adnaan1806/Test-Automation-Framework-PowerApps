@@ -44,6 +44,37 @@ test.describe('2. Audit and assurance revenue section', () => {
     await reportDetailPage.assertCombinedTurnoverHidden();
   });
 
+  test('Section status shows In progress when a required field is empty and saved', async ({ reportDetailPage }) => {
+    // Arrange — all fields filled except 2.4 Reviews (left blank)
+    await reportDetailPage.fillAuditSection(testData.auditSectionPartial);
+
+    // Act
+    await reportDetailPage.saveAuditSection();
+
+    // Assert — incomplete form shows "In progress" not "Completed"
+    await reportDetailPage.assertAuditSectionStatusInProgress();
+  });
+
+  test('Section status shows Validation error when invalid values are saved', async ({ reportDetailPage }) => {
+    // Arrange — values that violate all three validation rules (2.3>2.2, 2.6>2.5, 2.8.1>2.7 Total)
+    await reportDetailPage.fillAuditSection(testData.auditSectionInvalid);
+
+    // Act — Save is still enabled because the EEA toggle guaranteed a dirty state
+    await reportDetailPage.saveAuditSection();
+
+    // Assert
+    await reportDetailPage.assertAuditSectionStatusValidationError();
+  });
+
+  test('Section status shows Completed after all fields are filled and saved', async ({ reportDetailPage }) => {
+    // Arrange & Act — fill all fields and save
+    await reportDetailPage.fillAuditSection(testData.auditSection);
+    await reportDetailPage.saveAuditSection();
+
+    // Assert — section header badge in the canvas changes to "Completed"
+    await reportDetailPage.assertAuditSectionStatusCompleted();
+  });
+
   test('Each input field accepts 14 digits and total correctly displays the large sum', async ({ reportDetailPage }) => {
     const d = testData.auditSectionMaxDigits;
 

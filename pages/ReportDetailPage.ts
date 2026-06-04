@@ -164,11 +164,27 @@ export class ReportDetailPage extends BasePage {
     await expect(
       this.page.getByText('Form saved: Audit and assurance revenue')
     ).toBeVisible({ timeout: TIMEOUTS.save });
-    // Section status badge inside the canvas updates to "Completed" after save
+    await this.assertAuditSectionStatusCompleted();
+  }
+
+  async assertAuditSectionStatus(expectedStatus: string): Promise<void> {
+    // Section status badge is a generic element adjacent to the section name in the canvas
     const canvas = await this.getCanvasFrame();
     await expect(
-      canvas.getByText('Audit and assurance revenue Completed')
+      canvas.getByText(`Audit and assurance revenue ${expectedStatus}`)
     ).toBeVisible({ timeout: TIMEOUTS.save });
+  }
+
+  async assertAuditSectionStatusCompleted(): Promise<void> {
+    await this.assertAuditSectionStatus('Completed');
+  }
+
+  async assertAuditSectionStatusInProgress(): Promise<void> {
+    await this.assertAuditSectionStatus('In progress');
+  }
+
+  async assertAuditSectionStatusValidationError(): Promise<void> {
+    await this.assertAuditSectionStatus('Validation error');
   }
 
   async assertCombinedTurnoverHidden(): Promise<void> {

@@ -18,6 +18,16 @@
     "combinedTurnover": "100000",
     "expectedTotal": 750000
   },
+  "auditSectionPartial": {
+    "relatedServiceEngagements": "100000",
+    "audits": "200000",
+    "pieAudits": "50000",
+    "reviews": "",
+    "otherAssurance": "300000",
+    "esgAssurance": "75000",
+    "isEEA": "Yes",
+    "combinedTurnover": "100000"
+  },
   "auditSectionMaxDigits": {
     "relatedServiceEngagements": "99999999999999",
     "audits": "99999999999999",
