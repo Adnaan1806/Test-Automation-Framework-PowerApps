@@ -7,16 +7,9 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
+    "types": ["node"],
     "outDir": "./dist",
-    "rootDir": "./",
-    "baseUrl": ".",
-    "paths": {
-      "@pages/*": ["pages/*"],
-      "@utils/*": ["utils/*"],
-      "@fixtures/*": ["fixtures/*"],
-      "@data/*": ["data/*"],
-      "@constants/*": ["constants/*"]
-    }
+    "rootDir": "./"
   },
   "include": ["**/*.ts"],
   "exclude": ["node_modules", "dist"]

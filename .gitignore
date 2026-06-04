@@ -5,6 +5,9 @@ reports/
 # Auth state — contains real tokens, NEVER commit
 .auth/
 
+# Environment variables — contains credentials, NEVER commit
+.env
+
 # Playwright artifacts
 test-results/
 playwright-report/

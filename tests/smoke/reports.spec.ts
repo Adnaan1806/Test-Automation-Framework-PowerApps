@@ -5,8 +5,7 @@ test('Reports — click Reports button and validate Reports page loads', async (
   await homePage.assertLandedOnHomePage();
 
   // Act
-  const canvas = page.frames().find(f => f.url().includes('runtime-app.powerplatform.com'))!;
-  await canvas.getByRole('button', { name: /Reports/ }).click();
+  await homePage.navigateToReports();
   await reportsPage.waitForReportsPage();
 
   // Assert

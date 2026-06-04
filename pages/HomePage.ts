@@ -1,30 +1,9 @@
-import { Page, Frame, expect } from '@playwright/test';
+import { Page, expect } from '@playwright/test';
+import { BasePage } from './BasePage';
 
-export class HomePage {
-  private readonly page: Page;
-
+export class HomePage extends BasePage {
   constructor(page: Page) {
-    this.page = page;
-  }
-
-  private async waitForCanvasFrame(timeout = 60000): Promise<Frame> {
-    const deadline = Date.now() + timeout;
-    while (Date.now() < deadline) {
-      const frame = this.page.frames().find(f =>
-        f.url().includes('runtime-app.powerplatform.com')
-      );
-      if (frame) return frame;
-      await this.page.waitForTimeout(500);
-    }
-    throw new Error('PowerApps canvas iframe not found after timeout');
-  }
-
-  private getCanvasFrame(): Frame {
-    const frame = this.page.frames().find(f =>
-      f.url().includes('runtime-app.powerplatform.com')
-    );
-    if (!frame) throw new Error('PowerApps canvas iframe not found');
-    return frame;
+    super(page);
   }
 
   async waitForAppReady(): Promise<void> {
@@ -37,10 +16,15 @@ export class HomePage {
     );
 
     // Poll for canvas iframe — cross-origin so must use Playwright frame list
-    const canvas = await this.waitForCanvasFrame(30000);
+    const canvas = await this.getCanvasFrame();
 
     // Wait for nav to render inside canvas
     await canvas.getByRole('button', { name: /Home/ }).waitFor({ state: 'visible', timeout: 60000 });
+  }
+
+  async navigateToReports(): Promise<void> {
+    const canvas = await this.getCanvasFrame();
+    await canvas.getByRole('button', { name: /Reports/ }).click();
   }
 
   async getPageTitle(): Promise<string> {
@@ -48,17 +32,17 @@ export class HomePage {
   }
 
   async getGreetingText(): Promise<string> {
-    const canvas = this.getCanvasFrame();
+    const canvas = await this.getCanvasFrame();
     return canvas.getByText(/Hello,/).innerText();
   }
 
   async getWelcomeHeading(): Promise<string> {
-    const canvas = this.getCanvasFrame();
+    const canvas = await this.getCanvasFrame();
     return canvas.getByText(/Welcome to/).innerText();
   }
 
   async isNavigationVisible(): Promise<boolean> {
-    const canvas = this.getCanvasFrame();
+    const canvas = await this.getCanvasFrame();
     return (
       (await canvas.getByRole('button', { name: /Home/ }).isVisible()) &&
       (await canvas.getByRole('button', { name: /Reports/ }).isVisible()) &&
@@ -67,9 +51,13 @@ export class HomePage {
   }
 
   async getTaskCount(): Promise<number> {
-    const canvas = this.getCanvasFrame();
-    const allButtons = await canvas.getByRole('button').count();
-    return Math.max(0, allButtons - 4);
+    const canvas = await this.getCanvasFrame();
+    const galleryText = await canvas.getByText(/Number of items in Gallery: \d+/)
+      .first()
+      .innerText()
+      .catch(() => '0');
+    const match = galleryText.match(/(\d+)/);
+    return match ? parseInt(match[1], 10) : 0;
   }
 
   async assertLandedOnHomePage(): Promise<void> {
@@ -80,7 +68,7 @@ export class HomePage {
   }
 
   async assertCanvasContentVisible(): Promise<void> {
-    const canvas = this.getCanvasFrame();
+    const canvas = await this.getCanvasFrame();
     await expect(canvas.getByRole('button', { name: /Home/ })).toBeVisible();
     await expect(canvas.getByRole('button', { name: /Reports/ })).toBeVisible();
     await expect(canvas.getByRole('button', { name: /Help/ })).toBeVisible();

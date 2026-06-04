@@ -1,11 +1,20 @@
+import 'dotenv/config';
 import { chromium, FullConfig } from '@playwright/test';
 import { LoginPage } from './pages/LoginPage';
+import { APP_URL } from './constants/config';
 import * as path from 'path';
 
 const AUTH_FILE = path.join(__dirname, '.auth', 'user.json');
-const APP_URL = 'https://apps.powerapps.com/play/e/88aafdc6-17fa-4c32-a5b5-35dbdbdf05c0/a/9d4e32af-d89c-4685-abc5-cdaa1913fd0c?tenantId=44f4e7a6-4821-44d7-b286-cd90436c6975&hint=a1f62549-ee5e-4ef6-a14c-97c22de63013&sourcetime=1779346434761&source=portal#';
 
 async function globalSetup(config: FullConfig): Promise<void> {
+  const email = process.env.TEST_EMAIL;
+  const password = process.env.TEST_PASSWORD;
+  if (!email || !password) {
+    throw new Error(
+      'TEST_EMAIL and TEST_PASSWORD environment variables are required. Copy .env.example to .env and fill in the values.'
+    );
+  }
+
   const browser = await chromium.launch({ headless: true });
   const context = await browser.newContext();
   const page = await context.newPage();
@@ -14,10 +23,7 @@ async function globalSetup(config: FullConfig): Promise<void> {
   await page.goto(APP_URL);
 
   const loginPage = new LoginPage(page);
-  await loginPage.login(
-    'bfr-dev.champion.user@bdoapoutlook.onmicrosoft.com',
-    'dev@champ4'
-  );
+  await loginPage.login(email, password);
 
   // Wait for canvas to load — PowerApps never reaches networkidle due to background polling
   await page.waitForLoadState('domcontentloaded', { timeout: 30000 });
