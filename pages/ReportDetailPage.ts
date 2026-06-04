@@ -84,6 +84,21 @@ export class ReportDetailPage extends BasePage {
     await expect(this.page.getByText('Form saved: General')).toBeVisible({ timeout: TIMEOUTS.save });
   }
 
+  async assertGeneralSectionStatus(expectedStatus: string): Promise<void> {
+    const canvas = await this.getCanvasFrame();
+    await expect(
+      canvas.getByText(`1. General ${expectedStatus}`)
+    ).toBeVisible({ timeout: TIMEOUTS.save });
+  }
+
+  async assertGeneralSectionStatusCompleted(): Promise<void> {
+    await this.assertGeneralSectionStatus('Completed');
+  }
+
+  async assertGeneralSectionStatusInProgress(): Promise<void> {
+    await this.assertGeneralSectionStatus('In progress');
+  }
+
   // ---------------------------------------------------------------------------
   // Section 2 — Audit and assurance revenue
   // ---------------------------------------------------------------------------

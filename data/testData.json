@@ -7,6 +7,10 @@
     "reportingCurrency": "USD",
     "totalRevenueDeclared": "1000000"
   },
+  "generalSectionPartial": {
+    "reportingCurrency": "USD",
+    "totalRevenueDeclared": ""
+  },
   "auditSection": {
     "relatedServiceEngagements": "100000",
     "audits": "200000",
