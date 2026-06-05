@@ -310,10 +310,14 @@ export class ReportDetailPage extends BasePage {
     await canvas.getByRole('button', { name: /^Save$/ }).first().click();
   }
 
-  async assertTaxSectionSaved(): Promise<void> {
+  async assertTaxSavedSuccessMessage(): Promise<void> {
     await expect(
       this.page.getByText('Form saved: Tax revenue')
     ).toBeVisible({ timeout: TIMEOUTS.save });
+  }
+
+  async assertTaxSectionSaved(): Promise<void> {
+    await this.assertTaxSavedSuccessMessage();
     await this.assertTaxSectionStatusCompleted();
   }
 

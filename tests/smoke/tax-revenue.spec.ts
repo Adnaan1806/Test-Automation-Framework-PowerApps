@@ -53,6 +53,17 @@ test.describe('3. Tax revenue section', () => {
     await reportDetailPage.assertTaxSectionStatusInProgress();
   });
 
+  test('Success message appears after saving the section', async ({ reportDetailPage }) => {
+    // Arrange — taxSection differs from taxSectionPartial (last save) so Save is enabled
+    await reportDetailPage.fillTaxSection(testData.taxSection);
+
+    // Act
+    await reportDetailPage.saveTaxSection();
+
+    // Assert — toast must appear on the main page outside the canvas
+    await reportDetailPage.assertTaxSavedSuccessMessage();
+  });
+
   test('Each input accepts 14 digits and total correctly displays the large sum', async ({ reportDetailPage }) => {
     const d = testData.taxSectionMaxDigits;
 
