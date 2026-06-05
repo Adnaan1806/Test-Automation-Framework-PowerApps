@@ -51,5 +51,56 @@
     "esgAssurance": "4525",
     "isEEA": "Yes",
     "combinedTurnover": "8938"
+  },
+  "taxSection": {
+    "compliance": "100000",
+    "corporateIntlTax": "200000",
+    "taxAssuranceRiskMgmt": "300000",
+    "transferPricing": "400000",
+    "indirectTax": "500000",
+    "employerServices": "600000",
+    "privateClientServices": "700000",
+    "maTaxServices": "800000",
+    "rdCreditsIncentives": "900000",
+    "otherTaxServices": "1000000",
+    "expectedTotal": 5500000
+  },
+  "taxSectionAlt": {
+    "compliance":             "10000000000001",
+    "corporateIntlTax":       "10000000000002",
+    "taxAssuranceRiskMgmt":   "10000000000003",
+    "transferPricing":        "10000000000004",
+    "indirectTax":            "10000000000005",
+    "employerServices":       "10000000000006",
+    "privateClientServices":  "10000000000007",
+    "maTaxServices":          "10000000000008",
+    "rdCreditsIncentives":    "10000000000009",
+    "otherTaxServices":       "10000000000010",
+    "expectedTotal":          100000000000055
+  },
+  "taxSectionPartial": {
+    "compliance": "100000",
+    "corporateIntlTax": "200000",
+    "taxAssuranceRiskMgmt": "300000",
+    "transferPricing": "400000",
+    "indirectTax": "",
+    "employerServices": "600000",
+    "privateClientServices": "700000",
+    "maTaxServices": "800000",
+    "rdCreditsIncentives": "900000",
+    "otherTaxServices": "1000000"
+  },
+  "taxSectionMaxDigits": {
+    "compliance":            "11000000000001",
+    "corporateIntlTax":      "11000000000002",
+    "taxAssuranceRiskMgmt":  "11000000000003",
+    "transferPricing":       "11000000000004",
+    "indirectTax":           "11000000000005",
+    "employerServices":      "11000000000006",
+    "privateClientServices": "11000000000007",
+    "maTaxServices":         "11000000000008",
+    "rdCreditsIncentives":   "11000000000009",
+    "otherTaxServices":      "11000000000010",
+    "expectedTotal":         110000000000055
   }
 }

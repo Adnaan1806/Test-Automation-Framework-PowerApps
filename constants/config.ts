@@ -5,9 +5,11 @@ export const APP_URL =
 export const CANVAS_FRAME_ORIGIN = 'runtime-app.powerplatform.com';
 
 export const TIMEOUTS = {
-  canvasFrame: 60_000,
-  navigation: 30_000,
-  elementVisible: 10_000,
-  galleryUpdate: 10_000,
-  save: 60_000,
+  domLoad:        60_000,
+  canvasFrame:   120_000,
+  appReady:      120_000,
+  navigation:     60_000,
+  elementVisible: 30_000,
+  galleryUpdate:  30_000,
+  save:          120_000,
 } as const;

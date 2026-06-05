@@ -3,7 +3,7 @@ import { LoginPage } from '../pages/LoginPage';
 import { HomePage } from '../pages/HomePage';
 import { ReportsPage } from '../pages/ReportsPage';
 import { ReportDetailPage } from '../pages/ReportDetailPage';
-import { APP_URL } from '../constants/config';
+import { APP_URL, TIMEOUTS } from '../constants/config';
 
 type Fixtures = {
   loginPage: LoginPage;
@@ -20,7 +20,7 @@ export const test = base.extend<Fixtures>({
 
   appPage: async ({ page }, use) => {
     await page.goto(APP_URL);
-    await page.waitForLoadState('domcontentloaded', { timeout: 30000 });
+    await page.waitForLoadState('domcontentloaded', { timeout: TIMEOUTS.domLoad });
     await use(page);
   },
 

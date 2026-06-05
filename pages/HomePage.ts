@@ -1,5 +1,6 @@
 import { Page, expect } from '@playwright/test';
 import { BasePage } from './BasePage';
+import { TIMEOUTS } from '../constants/config';
 
 export class HomePage extends BasePage {
   constructor(page: Page) {
@@ -7,19 +8,19 @@ export class HomePage extends BasePage {
   }
 
   async waitForAppReady(): Promise<void> {
-    await this.page.waitForLoadState('domcontentloaded', { timeout: 30000 });
+    await this.page.waitForLoadState('domcontentloaded', { timeout: TIMEOUTS.domLoad });
 
     // Wait for outer shell loading screen to clear
     await this.page.waitForFunction(
       () => !document.body.innerText.includes('Fetching your app'),
-      { timeout: 60000 }
+      { timeout: TIMEOUTS.appReady }
     );
 
     // Poll for canvas iframe — cross-origin so must use Playwright frame list
     const canvas = await this.getCanvasFrame();
 
     // Wait for nav to render inside canvas
-    await canvas.getByRole('button', { name: /Home/ }).waitFor({ state: 'visible', timeout: 60000 });
+    await canvas.getByRole('button', { name: /Home/ }).waitFor({ state: 'visible', timeout: TIMEOUTS.appReady });
   }
 
   async navigateToReports(): Promise<void> {

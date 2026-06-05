@@ -248,4 +248,112 @@ export class ReportDetailPage extends BasePage {
       canvas.getByText('Value can not be greater than A&A revenue total')
     ).toBeVisible();
   }
+
+  // ---------------------------------------------------------------------------
+  // Section 3 — Tax revenue
+  // ---------------------------------------------------------------------------
+
+  async expandTaxSection(): Promise<void> {
+    const canvas = await this.getCanvasFrame();
+    await canvas.getByText('3. Tax revenue').click();
+    await canvas.getByRole('textbox', { name: '3.1 Compliance' })
+      .waitFor({ state: 'visible', timeout: 15000 });
+  }
+
+  async fillTaxSection(data: {
+    compliance: string;
+    corporateIntlTax: string;
+    taxAssuranceRiskMgmt: string;
+    transferPricing: string;
+    indirectTax: string;
+    employerServices: string;
+    privateClientServices: string;
+    maTaxServices: string;
+    rdCreditsIncentives: string;
+    otherTaxServices: string;
+  }): Promise<void> {
+    const canvas = await this.getCanvasFrame();
+
+    // Each getByRole locator already resolves to exactly one element — the editable
+    // "this year" input — because the read-only "previous year" inputs have no
+    // accessible name (or a different one) in the PowerApps DOM.
+    const fill = async (locator: Locator, value: string) => {
+      await locator.click();
+      await locator.fill(value); // fill('') clears the field for partial-data tests
+    };
+
+    await fill(canvas.getByRole('textbox', { name: '3.1 Compliance' }), data.compliance);
+    await fill(canvas.getByRole('textbox', { name: 'Corporate international tax' }), data.corporateIntlTax);
+    await fill(canvas.getByRole('textbox', { name: '3.3 Tax assurance and risk' }), data.taxAssuranceRiskMgmt);
+    await fill(canvas.getByRole('textbox', { name: 'Transfer pricing' }), data.transferPricing);
+    await fill(canvas.getByRole('textbox', { name: 'Indirect tax' }), data.indirectTax);
+    await fill(canvas.getByRole('textbox', { name: 'Employer services' }), data.employerServices);
+    await fill(canvas.getByRole('textbox', { name: 'Private clients services' }), data.privateClientServices);
+    await fill(canvas.getByRole('textbox', { name: '3.8 M&A tax services' }), data.maTaxServices);
+    await fill(canvas.getByRole('textbox', { name: 'R&D credits and incentives' }), data.rdCreditsIncentives);
+    const lastField = canvas.getByRole('textbox', { name: 'Other tax services' });
+    await fill(lastField, data.otherTaxServices);
+    // Blur the last field so the PowerApps formula recalculates 3.11 Total client-side
+    await lastField.press('Tab');
+  }
+
+  async getTaxTotal(): Promise<number> {
+    const canvas = await this.getCanvasFrame();
+    // Both columns share title "3.11 Total" (both are readonly calculated fields).
+    // .first() targets the "this year" column which is always left/first in the DOM.
+    const raw = await canvas.locator('input[title="3.11 Total"]').first().inputValue();
+    return parseFloat(raw.replace(/[^0-9.]/g, ''));
+  }
+
+  async saveTaxSection(): Promise<void> {
+    const canvas = await this.getCanvasFrame();
+    await canvas.getByRole('button', { name: /^Save$/ }).first().click();
+  }
+
+  async assertTaxSectionSaved(): Promise<void> {
+    await expect(
+      this.page.getByText('Form saved: Tax revenue')
+    ).toBeVisible({ timeout: TIMEOUTS.save });
+    await this.assertTaxSectionStatusCompleted();
+  }
+
+  async assertTaxSectionStatus(expectedStatus: string): Promise<void> {
+    const canvas = await this.getCanvasFrame();
+    await expect(
+      canvas.getByText(`Tax revenue ${expectedStatus}`)
+    ).toBeVisible({ timeout: TIMEOUTS.save });
+  }
+
+  async assertTaxSectionStatusCompleted(): Promise<void> {
+    await this.assertTaxSectionStatus('Completed');
+  }
+
+  async assertTaxSectionStatusInProgress(): Promise<void> {
+    await this.assertTaxSectionStatus('In progress');
+  }
+
+  async assertTaxSectionFieldValues(data: {
+    compliance: string;
+    corporateIntlTax: string;
+    taxAssuranceRiskMgmt: string;
+    transferPricing: string;
+    indirectTax: string;
+    employerServices: string;
+    privateClientServices: string;
+    maTaxServices: string;
+    rdCreditsIncentives: string;
+    otherTaxServices: string;
+  }): Promise<void> {
+    const canvas = await this.getCanvasFrame();
+    await expect(canvas.getByRole('textbox', { name: '3.1 Compliance' })).toHaveValue(data.compliance);
+    await expect(canvas.getByRole('textbox', { name: 'Corporate international tax' })).toHaveValue(data.corporateIntlTax);
+    await expect(canvas.getByRole('textbox', { name: '3.3 Tax assurance and risk' })).toHaveValue(data.taxAssuranceRiskMgmt);
+    await expect(canvas.getByRole('textbox', { name: 'Transfer pricing' })).toHaveValue(data.transferPricing);
+    await expect(canvas.getByRole('textbox', { name: 'Indirect tax' })).toHaveValue(data.indirectTax);
+    await expect(canvas.getByRole('textbox', { name: 'Employer services' })).toHaveValue(data.employerServices);
+    await expect(canvas.getByRole('textbox', { name: 'Private clients services' })).toHaveValue(data.privateClientServices);
+    await expect(canvas.getByRole('textbox', { name: '3.8 M&A tax services' })).toHaveValue(data.maTaxServices);
+    await expect(canvas.getByRole('textbox', { name: 'R&D credits and incentives' })).toHaveValue(data.rdCreditsIncentives);
+    await expect(canvas.getByRole('textbox', { name: 'Other tax services' })).toHaveValue(data.otherTaxServices);
+  }
 }
