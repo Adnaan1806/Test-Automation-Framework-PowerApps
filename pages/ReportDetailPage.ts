@@ -278,8 +278,8 @@ export class ReportDetailPage extends BasePage {
     // "this year" input — because the read-only "previous year" inputs have no
     // accessible name (or a different one) in the PowerApps DOM.
     const fill = async (locator: Locator, value: string) => {
-      await locator.click();
-      await locator.fill(value); // fill('') clears the field for partial-data tests
+      await locator.clear();
+      await locator.fill(value);
     };
 
     await fill(canvas.getByRole('textbox', { name: '3.1 Compliance' }), data.compliance);
